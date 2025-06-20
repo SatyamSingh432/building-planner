@@ -20,15 +20,16 @@ const Canvas = () => {
   const startDrawing = (e) => {
     isDrawing.current = true;
     const { offsetX, offsetY } = e.nativeEvent;
-    if (drawingMode === "rectangle") {
-      startPoint.current = { x: offsetX, y: offsetY };
+    startPoint.current = { x: offsetX, y: offsetY };
+
+    if (drawingMode !== "free") {
       savedImage.current = ctx.getImageData(
         0,
         0,
         canvasRef.current.width,
         canvasRef.current.height
       );
-    } else if (drawingMode === "free") {
+    } else {
       ctx.beginPath();
       ctx.moveTo(offsetX, offsetY);
     }
@@ -37,23 +38,56 @@ const Canvas = () => {
   const draw = (e) => {
     if (!isDrawing.current) return;
     const { offsetX, offsetY } = e.nativeEvent;
-    if (drawingMode === "rectangle") {
-      const { x: startX, y: startY } = startPoint.current;
-      ctx.putImageData(savedImage.current, 0, 0);
-      const width = offsetX - startX;
-      const height = offsetY - startY;
-      ctx.strokeRect(startX, startY, width, height);
-    } else if (drawingMode === "free") {
+    const { x: startX, y: startY } = startPoint.current;
+
+    if (drawingMode === "free") {
       ctx.lineTo(offsetX, offsetY);
       ctx.stroke();
+      return;
+    }
+
+    ctx.putImageData(savedImage.current, 0, 0);
+
+    const width = offsetX - startX;
+    const height = offsetY - startY;
+
+    switch (drawingMode) {
+      case "rectangle":
+        ctx.strokeRect(startX, startY, width, height);
+        break;
+
+      case "square":
+        const size = Math.min(Math.abs(width), Math.abs(height));
+        ctx.strokeRect(
+          startX,
+          startY,
+          width < 0 ? -size : size,
+          height < 0 ? -size : size
+        );
+        break;
+
+      case "circle":
+        const radius = Math.sqrt(width ** 2 + height ** 2);
+        ctx.beginPath();
+        ctx.arc(startX, startY, radius, 0, Math.PI * 2);
+        ctx.stroke();
+        break;
+
+      case "line":
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(offsetX, offsetY);
+        ctx.stroke();
+        break;
+
+      default:
+        break;
     }
   };
 
   const stopDrawing = () => {
     isDrawing.current = false;
-    if (drawingMode === "free") {
-      ctx.closePath();
-    }
+    if (drawingMode === "free") ctx.closePath();
   };
 
   return (
@@ -61,6 +95,9 @@ const Canvas = () => {
       <div>
         <button onClick={() => setDrawingMode("free")}>Free Draw</button>
         <button onClick={() => setDrawingMode("rectangle")}>Rectangle</button>
+        <button onClick={() => setDrawingMode("square")}>Square</button>
+        <button onClick={() => setDrawingMode("circle")}>Circle</button>
+        <button onClick={() => setDrawingMode("line")}>Line</button>
       </div>
       <canvas
         ref={canvasRef}
