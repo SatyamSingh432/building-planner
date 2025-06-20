@@ -1,17 +1,44 @@
-import { useState } from "react";
-import { Stage, Layer, Rect, Circle, Line, Text } from "react-konva";
+import { useState, useRef, useEffect } from "react";
+import {
+  Stage,
+  Layer,
+  Rect,
+  Circle,
+  Line,
+  Text,
+  Transformer,
+} from "react-konva";
 import { useDrawing } from "../context/DrawingContext";
 
 const Canvas = () => {
   const { shapes, annotationsVisible, tool, setShapes } = useDrawing();
   const [newShape, setNewShape] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
   const stageHeight = window.innerHeight;
   const stageWidth = window.innerWidth;
+  const shapeRefs = useRef([]);
+  const transformerRef = useRef();
+
+  useEffect(() => {
+    const node = shapeRefs.current[selectedId];
+    if (transformerRef.current && node) {
+      transformerRef.current.nodes([node]);
+      transformerRef.current.getLayer().batchDraw();
+    }
+  }, [selectedId]);
 
   const handleMouseDown = (e) => {
     const stage = e.target.getStage();
     const point = stage.getPointerPosition();
-    console.log({ point });
+
+    if (tool === "select") {
+      const clickedOnEmpty = e.target === stage;
+      if (clickedOnEmpty) {
+        setSelectedId(null);
+      }
+      return;
+    }
+
     if (tool === "rect") {
       setNewShape({
         type: "rect",
@@ -34,8 +61,6 @@ const Canvas = () => {
     if (!newShape) return;
     const stage = e.target.getStage();
     const point = stage.getPointerPosition();
-
-    console.log("move", point);
 
     if (newShape.type === "rect") {
       setNewShape((prev) => ({
@@ -65,6 +90,12 @@ const Canvas = () => {
     }
   };
 
+  const updateShape = (index, newAttrs) => {
+    const updated = [...shapes];
+    updated[index] = { ...updated[index], ...newAttrs };
+    setShapes(updated);
+  };
+
   return (
     <Stage
       width={stageWidth}
@@ -74,20 +105,42 @@ const Canvas = () => {
       onMouseUp={handleMouseUp}
     >
       <Layer>
-        {[...shapes, ...(newShape ? [newShape] : [])].map((shape, i) => {
+        {[...shapes, ...(newShape ? [newShape] : [])].map((shape, idx) => {
+          const isSelected = idx === selectedId;
+
           switch (shape.type) {
             case "rect":
               return (
                 <>
                   <Rect
-                    key={i}
+                    key={idx}
+                    ref={(node) => (shapeRefs.current[idx] = node)}
                     x={shape.x}
                     y={shape.y}
                     width={shape.width}
                     height={shape.height}
                     fill="rgba(0,0,255,0.2)"
                     stroke="blue"
+                    draggable={tool === "select"}
+                    onClick={() => tool === "select" && setSelectedId(idx)}
+                    onDragEnd={(e) => {
+                      updateShape(idx, { x: e.target.x(), y: e.target.y() });
+                    }}
+                    onTransformEnd={(e) => {
+                      const node = e.target;
+                      updateShape(idx, {
+                        x: node.x(),
+                        y: node.y(),
+                        width: node.width() * node.scaleX(),
+                        height: node.height() * node.scaleY(),
+                      });
+                      node.scaleX(1);
+                      node.scaleY(1);
+                    }}
                   />
+                  {isSelected && tool === "select" && (
+                    <Transformer ref={transformerRef} rotateEnabled={false} />
+                  )}
                   {annotationsVisible && (
                     <Text
                       text={`W: ${Math.abs(shape.width)} H: ${Math.abs(
@@ -105,13 +158,33 @@ const Canvas = () => {
               return (
                 <>
                   <Circle
-                    key={i}
+                    key={idx}
+                    ref={(node) => (shapeRefs.current[idx] = node)}
                     x={shape.x}
                     y={shape.y}
                     radius={shape.radius}
                     fill="rgba(255,0,0,0.2)"
                     stroke="red"
+                    draggable={tool === "select"}
+                    onClick={() => tool === "select" && setSelectedId(idx)}
+                    onDragEnd={(e) =>
+                      updateShape(idx, { x: e.target.x(), y: e.target.y() })
+                    }
+                    onTransformEnd={(e) => {
+                      const node = e.target;
+                      const newRadius = (node.width() * node.scaleX()) / 2;
+                      updateShape(idx, {
+                        x: node.x(),
+                        y: node.y(),
+                        radius: newRadius,
+                      });
+                      node.scaleX(1);
+                      node.scaleY(1);
+                    }}
                   />
+                  {isSelected && tool === "select" && (
+                    <Transformer ref={transformerRef} rotateEnabled={false} />
+                  )}
                   {annotationsVisible && (
                     <Text
                       text={`R: ${Math.abs(shape.radius)}`}
@@ -127,11 +200,20 @@ const Canvas = () => {
               return (
                 <>
                   <Line
-                    key={i}
+                    key={idx}
+                    ref={(node) => (shapeRefs.current[idx] = node)}
                     points={shape.points}
                     stroke="green"
                     strokeWidth={2}
+                    onClick={() => tool === "select" && setSelectedId(idx)}
                   />
+                  {isSelected && tool === "select" && (
+                    <Transformer
+                      ref={transformerRef}
+                      rotateEnabled={false}
+                      enabledAnchors={[]}
+                    />
+                  )}
                   {annotationsVisible && shape.points.length === 4 && (
                     <Text
                       text={`Length: ${Math.hypot(
