@@ -1,19 +1,41 @@
-import { Stage, Layer, Circle } from "react-konva";
+import { Stage, Layer, Rect, Text } from "react-konva";
 import { useDrawing } from "../context/DrawingContext";
 
 const Canvas = () => {
-  const { tool } = useDrawing();
-  console.log(tool);
+  const { shapes, annotationsVisible } = useDrawing();
+
+  const stageHeight = window.innerHeight;
+  const stageWidth = window.innerWidth;
 
   return (
-    <Stage width={window.innerWidth} height={window.innerHeight}>
+    <Stage width={stageWidth} height={stageHeight}>
       <Layer>
-        <Circle
-          x={window.innerWidth / 2}
-          y={window.innerHeight / 2}
-          radius={50}
-          fill="red"
-        />
+        {shapes.map((shape, i) => {
+          return (
+            <>
+              <Rect
+                key={i}
+                x={shape.x}
+                y={shape.y}
+                width={shape.width}
+                height={shape.height}
+                fill="rgba(0,0,255,0.2)"
+                stroke="blue"
+              />
+              {annotationsVisible && (
+                <Text
+                  text={`W: ${Math.abs(shape.width)} H: ${Math.abs(
+                    shape.height
+                  )}`}
+                  x={shape.x}
+                  y={shape.y - 20}
+                  fontSize={14}
+                  fill="black"
+                />
+              )}
+            </>
+          );
+        })}
       </Layer>
     </Stage>
   );
