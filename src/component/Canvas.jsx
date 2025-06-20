@@ -1,7 +1,10 @@
-import React, { useRef, useEffect } from "react";
 import { Stage, Layer, Circle } from "react-konva";
+import { useDrawing } from "../context/DrawingContext";
 
 const Canvas = () => {
+  const { tool } = useDrawing();
+  console.log(tool);
+
   return (
     <Stage width={window.innerWidth} height={window.innerHeight}>
       <Layer>

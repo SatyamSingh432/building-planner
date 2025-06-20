@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useDrawing } from "../context/DrawingContext";
 
 const TOOL_LIST = ["select", "rect", "circle", "line"];
 
 const Toolbar = () => {
-  const [tool, setTool] = useState("select");
-  const [annotationsVisible, setAnnotationsVisible] = useState(false);
+  const { tool, setTool, annotationsVisible, setAnnotationsVisible } =
+    useDrawing();
 
   return (
     <div className="flex gap-2 p-2 bg-gray-100">
