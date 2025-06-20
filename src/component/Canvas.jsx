@@ -20,6 +20,22 @@ const Canvas = () => {
   const transformerRef = useRef();
 
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (
+        (e.key === "Delete" || e.key === "Backspace") &&
+        selectedId !== null
+      ) {
+        const updated = [...shapes];
+        updated.splice(selectedId, 1);
+        setShapes(updated);
+        setSelectedId(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedId, shapes, setShapes]);
+
+  useEffect(() => {
     const node = shapeRefs.current[selectedId];
     if (transformerRef.current && node) {
       transformerRef.current.nodes([node]);
