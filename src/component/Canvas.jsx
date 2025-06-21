@@ -5,6 +5,7 @@ import {
   Rect,
   Circle,
   Line,
+  Arrow,
   Text,
   Transformer,
 } from "react-konva";
@@ -70,6 +71,11 @@ const Canvas = () => {
         type: "line",
         points: [point.x, point.y, point.x, point.y],
       });
+    } else if (tool === "arrow") {
+      setNewShape({
+        type: "arrow",
+        points: [point.x, point.y, point.x, point.y],
+      });
     }
   };
 
@@ -92,6 +98,11 @@ const Canvas = () => {
         radius: Math.sqrt(dx * dx + dy * dy),
       }));
     } else if (newShape.type === "line") {
+      setNewShape((prev) => ({
+        ...prev,
+        points: [prev.points[0], prev.points[1], point.x, point.y],
+      }));
+    } else if (newShape.type === "arrow") {
       setNewShape((prev) => ({
         ...prev,
         points: [prev.points[0], prev.points[1], point.x, point.y],
@@ -222,6 +233,17 @@ const Canvas = () => {
                     stroke="green"
                     strokeWidth={2}
                     onClick={() => tool === "select" && setSelectedId(idx)}
+                    draggable={tool === "select"}
+                    onDragEnd={(e) => {
+                      const node = e.target;
+                      const dx = node.x();
+                      const dy = node.y();
+                      const newPoints = shape.points.map((p, i) =>
+                        i % 2 === 0 ? p + dx : p + dy
+                      );
+                      updateShape(idx, { points: newPoints });
+                      node.position({ x: 0, y: 0 });
+                    }}
                   />
                   {isSelected && tool === "select" && (
                     <Transformer
@@ -244,6 +266,41 @@ const Canvas = () => {
                   )}
                 </>
               );
+            case "arrow":
+              return (
+                <>
+                  <Arrow
+                    key={idx}
+                    ref={(node) => (shapeRefs.current[idx] = node)}
+                    points={shape.points}
+                    pointerLength={10}
+                    pointerWidth={10}
+                    fill="black"
+                    stroke="black"
+                    strokeWidth={2}
+                    onClick={() => tool === "select" && setSelectedId(idx)}
+                    draggable={tool === "select"}
+                    onDragEnd={(e) => {
+                      const node = e.target;
+                      const dx = node.x();
+                      const dy = node.y();
+                      const newPoints = shape.points.map((p, i) =>
+                        i % 2 === 0 ? p + dx : p + dy
+                      );
+                      updateShape(idx, { points: newPoints });
+                      node.position({ x: 0, y: 0 });
+                    }}
+                  />
+                  {isSelected && tool === "select" && (
+                    <Transformer
+                      ref={transformerRef}
+                      rotateEnabled={false}
+                      enabledAnchors={[]}
+                    />
+                  )}
+                </>
+              );
+
             default:
               return null;
           }

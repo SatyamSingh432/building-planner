@@ -1,10 +1,15 @@
 import { useDrawing } from "../context/DrawingContext";
 
-const TOOL_LIST = ["select", "rect", "circle", "line"];
+const TOOL_LIST = ["select", "rect", "circle", "line", "arrow"];
 
 const Toolbar = () => {
-  const { tool, setTool, annotationsVisible, setAnnotationsVisible } =
-    useDrawing();
+  const {
+    tool,
+    setTool,
+    annotationsVisible,
+    setAnnotationsVisible,
+    setShapes,
+  } = useDrawing();
 
   return (
     <div className="flex gap-2 p-2 bg-gray-100">
@@ -19,6 +24,12 @@ const Toolbar = () => {
           {selectedTool}
         </button>
       ))}
+      <button
+        onClick={() => setShapes([])}
+        className="ml-auto px-3 py-1 rounded bg-gray-300 cursor-pointer"
+      >
+        Clear
+      </button>
 
       <button
         onClick={() => setAnnotationsVisible(!annotationsVisible)}
