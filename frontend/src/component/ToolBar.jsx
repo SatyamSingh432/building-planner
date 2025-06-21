@@ -1,4 +1,5 @@
 import { useDrawing } from "../context/DrawingContext";
+import { deleteAllShapes } from "../utils/Apis";
 
 const TOOL_LIST = ["select", "rect", "circle", "line", "arrow"];
 
@@ -25,7 +26,10 @@ const Toolbar = () => {
         </button>
       ))}
       <button
-        onClick={() => setShapes([])}
+        onClick={async () => {
+          setShapes([]);
+          await deleteAllShapes();
+        }}
         className="ml-auto px-3 py-1 rounded bg-gray-300 cursor-pointer"
       >
         Clear

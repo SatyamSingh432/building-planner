@@ -49,5 +49,12 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
+router.delete("/", async (req, res) => {
+  try {
+    await Shape.deleteMany({});
+    res.json({ message: "All shapes deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 export default router;
