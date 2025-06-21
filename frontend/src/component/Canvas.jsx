@@ -10,6 +10,12 @@ import {
   Transformer,
 } from "react-konva";
 import { useDrawing } from "../context/DrawingContext";
+import {
+  saveShape,
+  getAllShapes,
+  deleteShape,
+  updateShapeAPI,
+} from "../utils/Apis";
 
 const Canvas = () => {
   const { shapes, annotationsVisible, tool, setShapes } = useDrawing();
@@ -21,11 +27,27 @@ const Canvas = () => {
   const transformerRef = useRef();
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const fetchShapes = async () => {
+      const data = await getAllShapes();
+      if (data) setShapes(data);
+    };
+
+    fetchShapes();
+  }, []);
+  useEffect(() => {
+    const handleKeyDown = async (e) => {
       if (
         (e.key === "Delete" || e.key === "Backspace") &&
         selectedId !== null
       ) {
+        console.log(shapes[selectedId]);
+        const shapeToDelete = shapes[selectedId];
+
+        try {
+          await deleteShape(shapeToDelete._id);
+        } catch (err) {
+          console.error("Delete failed", err);
+        }
         const updated = [...shapes];
         updated.splice(selectedId, 1);
         setShapes(updated);
@@ -110,8 +132,10 @@ const Canvas = () => {
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = async () => {
     if (newShape) {
+      const shapeToSave = { ...newShape };
+      await saveShape(shapeToSave);
       setShapes([...shapes, newShape]);
       setNewShape(null);
     }
@@ -150,16 +174,25 @@ const Canvas = () => {
                     stroke="blue"
                     draggable={tool === "select"}
                     onClick={() => tool === "select" && setSelectedId(idx)}
-                    onDragEnd={(e) => {
+                    onDragEnd={async (e) => {
                       updateShape(idx, { x: e.target.x(), y: e.target.y() });
+                      await updateShapeAPI(shape._id, {
+                        ...shape,
+                        ...{ x: e.target.x(), y: e.target.y() },
+                      });
                     }}
-                    onTransformEnd={(e) => {
+                    onTransformEnd={async (e) => {
                       const node = e.target;
-                      updateShape(idx, {
+                      const newAttrs = {
                         x: node.x(),
                         y: node.y(),
                         width: node.width() * node.scaleX(),
                         height: node.height() * node.scaleY(),
+                      };
+                      updateShape(idx, newAttrs);
+                      await updateShapeAPI(shape._id, {
+                        ...shape,
+                        ...newAttrs,
                       });
                       node.scaleX(1);
                       node.scaleY(1);
@@ -194,16 +227,27 @@ const Canvas = () => {
                     stroke="red"
                     draggable={tool === "select"}
                     onClick={() => tool === "select" && setSelectedId(idx)}
-                    onDragEnd={(e) =>
-                      updateShape(idx, { x: e.target.x(), y: e.target.y() })
-                    }
-                    onTransformEnd={(e) => {
+                    onDragEnd={async (e) => {
+                      const newAttrs = { x: e.target.x(), y: e.target.y() };
+                      updateShape(idx, newAttrs);
+                      await updateShapeAPI(shape._id, {
+                        ...shape,
+                        ...newAttrs,
+                      });
+                    }}
+                    onTransformEnd={async (e) => {
                       const node = e.target;
                       const newRadius = (node.width() * node.scaleX()) / 2;
-                      updateShape(idx, {
+                      const newAttrs = {
                         x: node.x(),
                         y: node.y(),
                         radius: newRadius,
+                      };
+
+                      updateShape(idx, newAttrs);
+                      await updateShapeAPI(shape._id, {
+                        ...shape,
+                        ...newAttrs,
                       });
                       node.scaleX(1);
                       node.scaleY(1);
@@ -234,7 +278,7 @@ const Canvas = () => {
                     strokeWidth={2}
                     onClick={() => tool === "select" && setSelectedId(idx)}
                     draggable={tool === "select"}
-                    onDragEnd={(e) => {
+                    onDragEnd={async (e) => {
                       const node = e.target;
                       const dx = node.x();
                       const dy = node.y();
@@ -242,6 +286,10 @@ const Canvas = () => {
                         i % 2 === 0 ? p + dx : p + dy
                       );
                       updateShape(idx, { points: newPoints });
+                      await updateShapeAPI(shape._id, {
+                        ...shape,
+                        points: newPoints,
+                      });
                       node.position({ x: 0, y: 0 });
                     }}
                   />
@@ -280,7 +328,7 @@ const Canvas = () => {
                     strokeWidth={2}
                     onClick={() => tool === "select" && setSelectedId(idx)}
                     draggable={tool === "select"}
-                    onDragEnd={(e) => {
+                    onDragEnd={async (e) => {
                       const node = e.target;
                       const dx = node.x();
                       const dy = node.y();
@@ -288,6 +336,10 @@ const Canvas = () => {
                         i % 2 === 0 ? p + dx : p + dy
                       );
                       updateShape(idx, { points: newPoints });
+                      await updateShapeAPI(shape._id, {
+                        ...shape,
+                        points: newPoints,
+                      });
                       node.position({ x: 0, y: 0 });
                     }}
                   />
