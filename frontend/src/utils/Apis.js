@@ -33,3 +33,14 @@ export const deleteShape = async (id) => {
     method: "DELETE",
   });
 };
+
+export const deleteAllShapes = async () => {
+  try {
+    await fetch(`${API_URL}/api/shapes`, {
+      method: "DELETE",
+    });
+  } catch (error) {
+    console.error("Failed to delete all shapes:", error);
+    return null;
+  }
+};
