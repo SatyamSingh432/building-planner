@@ -113,6 +113,8 @@ src/
 |   |__ ToolBar.jsx
 ├── context/
 │   └── DrawingContext.jsx    # React context for global state
+|-- utils/
+|   |__Apis.js
 ├── App.jsx
 ├── main.jsx
 ```
