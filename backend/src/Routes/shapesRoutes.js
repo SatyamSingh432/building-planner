@@ -22,4 +22,32 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const updatedShape = await Shape.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!updatedShape) {
+      return res.status(404).json({ message: "Shape not found" });
+    }
+    res.json(updatedShape);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    const deletedShape = await Shape.findByIdAndDelete(req.params.id);
+    if (!deletedShape) {
+      return res.status(404).json({ message: "Shape not found" });
+    }
+    res.json({ message: "Shape deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
