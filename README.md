@@ -109,7 +109,8 @@ npm run dev
 ```
 src/
 ├── components/
-│   └── Canvas.jsx      # Main drawing canvas logic
+│   └── Canvas.jsx     # Main drawing canvas logic
+|   |__ ToolBar.jsx
 ├── context/
 │   └── DrawingContext.jsx    # React context for global state
 ├── App.jsx
