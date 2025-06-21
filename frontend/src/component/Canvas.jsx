@@ -135,8 +135,8 @@ const Canvas = () => {
   const handleMouseUp = async () => {
     if (newShape) {
       const shapeToSave = { ...newShape };
-      await saveShape(shapeToSave);
       setShapes([...shapes, newShape]);
+      await saveShape(shapeToSave);
       setNewShape(null);
     }
   };
