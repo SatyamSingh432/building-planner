@@ -1,12 +1,114 @@
-# React + Vite
+# 🏗️ Building Planner Web App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A lightweight web application to draw, annotate, and manage simple building plans in-browser. Built with React and Konva.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## Expanding the ESLint configuration
+### ✏️ Drawing Tools
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Draw shapes: Rectangle, Circle, Line and Arrow
+- Real-time shape preview during drawing
+
+### 🧲 Shape Selection
+
+- Select any shape to move or resize
+- Transformer box for selected shape
+
+### 📐 Annotations
+
+- Auto-dimensions for each shape:
+
+  - Rect: Width x Height
+  - Circle: Radius
+  - Line: Length
+  - Arrow: Length
+
+- Toggle annotation visibility
+
+### 🛠️ Editing
+
+- Resize using transformer handles (rectangles, circles)
+- Drag to reposition any shape
+- Press **Delete** or **Backspace** to remove selected shape
+
+### 💾 Architecture
+
+- **React** for component-driven UI
+- **Tailwind CSS** for clean design
+- **Konva / react-konva** for canvas rendering
+- **Context API** for shared state
+- **MongoDB + Mongoose** planned for persistence
+
+---
+
+## 🧑‍💻 Getting Started
+
+### Prerequisites
+
+- Node.js >= 16
+
+### Clone the repository
+
+```bash
+git clone https://github.com/SatyamSingh432/building-planner.git
+cd building-planner
+```
+
+### Install Frontend Dependency
+
+```bash
+cd frontend
+npm install
+```
+
+### Run the App
+
+```bash
+npm run dev
+```
+
+### Install Backend Dependency
+
+```bash
+cd backend
+npm install
+```
+
+### Run the App
+
+```bash
+npm run dev
+```
+
+---
+
+## 📸 Screenshots
+
+1. **Drawing a shape**
+2. **Selected shape with resize handles**
+3. **Shapes with visible annotations**
+4. **Deleting a shape**
+
+---
+
+## 📂 Project Structure
+
+```
+src/
+├── components/
+│   └── Canvas.jsx      # Main drawing canvas logic
+├── context/
+│   └── DrawingContext.jsx    # React context for global state
+├── App.jsx
+├── main.jsx
+```
+
+---
+
+## 👨‍🔧 Author
+
+Made with ❤️ by Satyam Singh
+
+Feel free to contribute or suggest improvements!
