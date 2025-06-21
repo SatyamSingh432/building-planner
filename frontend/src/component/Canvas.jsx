@@ -26,12 +26,11 @@ const Canvas = () => {
   const shapeRefs = useRef([]);
   const transformerRef = useRef();
 
+  const fetchShapes = async () => {
+    const data = await getAllShapes();
+    if (data) setShapes(data);
+  };
   useEffect(() => {
-    const fetchShapes = async () => {
-      const data = await getAllShapes();
-      if (data) setShapes(data);
-    };
-
     fetchShapes();
   }, []);
   useEffect(() => {
@@ -138,6 +137,7 @@ const Canvas = () => {
       setShapes([...shapes, newShape]);
       setNewShape(null);
       await saveShape(shapeToSave);
+      await fetchShapes();
     }
   };
 
