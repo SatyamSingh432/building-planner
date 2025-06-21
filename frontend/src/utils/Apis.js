@@ -1,5 +1,5 @@
 // const API_URL = "http://localhost:8080";
-const API_URL = "https://building-planner-lv9c.onrender.com/";
+const API_URL = "https://building-planner-lv9c.onrender.com";
 
 export const saveShape = async (shape) => {
   await fetch(`${API_URL}/api/shapes`, {
