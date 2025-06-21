@@ -136,8 +136,8 @@ const Canvas = () => {
     if (newShape) {
       const shapeToSave = { ...newShape };
       setShapes([...shapes, newShape]);
-      await saveShape(shapeToSave);
       setNewShape(null);
+      await saveShape(shapeToSave);
     }
   };
 
