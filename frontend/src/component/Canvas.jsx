@@ -190,12 +190,13 @@ const Canvas = () => {
                         height: node.height() * node.scaleY(),
                       };
                       updateShape(idx, newAttrs);
+
+                      node.scaleX(1);
+                      node.scaleY(1);
                       await updateShapeAPI(shape._id, {
                         ...shape,
                         ...newAttrs,
                       });
-                      node.scaleX(1);
-                      node.scaleY(1);
                     }}
                   />
                   {isSelected && tool === "select" && (
@@ -245,12 +246,13 @@ const Canvas = () => {
                       };
 
                       updateShape(idx, newAttrs);
+
+                      node.scaleX(1);
+                      node.scaleY(1);
                       await updateShapeAPI(shape._id, {
                         ...shape,
                         ...newAttrs,
                       });
-                      node.scaleX(1);
-                      node.scaleY(1);
                     }}
                   />
                   {isSelected && tool === "select" && (
